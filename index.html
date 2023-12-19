@@ -158,35 +158,35 @@
         document.addEventListener("DOMContentLoaded", function () {
             const cameraSelector = document.getElementById('cameraSelector');
             const preview = document.getElementById('preview');
-
+    
             navigator.mediaDevices.enumerateDevices()
                 .then(devices => {
                     const videoDevices = devices.filter(device => device.kind === 'videoinput');
-
+    
                     if (videoDevices.length === 0) {
                         throw new Error('No se encontraron cámaras en el dispositivo.');
                     }
-
+    
                     videoDevices.forEach((camera, index) => {
                         const option = document.createElement('option');
                         option.value = index;
                         option.text = camera.label || `Cámara ${index + 1}`;
                         cameraSelector.add(option);
                     });
-
+    
                     const constraints = {
                         video: {
                             deviceId: { exact: videoDevices[0].deviceId },
                             facingMode: "environment"
                         }
                     };
-
+    
                     return navigator.mediaDevices.getUserMedia(constraints);
                 })
                 .then(stream => {
                     preview.srcObject = stream;
                     preview.play();
-
+    
                     cameraSelector.addEventListener('change', function () {
                         const selectedCamera = videoDevices[cameraSelector.value];
                         const newConstraints = {
@@ -195,7 +195,7 @@
                                 facingMode: "environment"
                             }
                         };
-
+    
                         navigator.mediaDevices.getUserMedia(newConstraints)
                             .then(newStream => {
                                 const tracks = preview.srcObject.getTracks();
@@ -207,23 +207,14 @@
                     });
                 })
                 .catch(error => console.error('Error al enumerar los dispositivos:', error));
-
+    
             preview.addEventListener('loadedmetadata', () => {
                 const handleQrCode = function (content) {
                     try {
                         const code = jsQR(content, preview.videoWidth, preview.videoHeight);
                         if (code) {
                             const mensajeAlerta = code.data;
-
-                            Swal.fire({
-                                title: 'CÓDIGO QR LEÍDO',
-                                text: mensajeAlerta,
-                                confirmButtonText: 'OK',
-                                customClass: {
-                                    confirmButton: 'custom-confirm-button',
-                                    content: 'custom-swal-content',
-                                },
-                            });
+                            alert(`CÓDIGO QR LEÍDO: ${mensajeAlerta}`);
                         } else {
                             console.warn('Código QR no válido.');
                         }
@@ -231,12 +222,13 @@
                         console.error('Error al procesar el código QR:', error);
                     }
                 };
-
+    
                 const qrScanner = new Instascan.Scanner({ video: preview });
                 qrScanner.addListener('scan', handleQrCode);
                 qrScanner.start();
             });
         });
     </script>
+    
 </body>
 </html>
