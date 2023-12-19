@@ -1,223 +1,54 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-
-    <title>Lector Farmacia Sanchez Antoniolli</title>
-    <link rel="icon" type="image/png" href="img/Logo.png" />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
-    <style>
-        @font-face {
-            font-family: 'Futura';
-            src: url('fonts/futura\ medium\ bt.ttf') format('truetype');
-        }
-
-        * {
-            font-family: 'Futura', sans-serif;
-        }
-
-        .mi-popup-clase {
-            background-color: white !important;
-            color: black !important;
-        }
-
-        .custom-confirm-button {
-            background-color: #1a6e6e !important;
-            color: #fff;
-        }
-
-        .mi-titulo-clase {
-            color: black !important;
-        }
-
-        #logo {
-            max-width: 30em;
-            width: 100%;
-            height: auto;
-            margin-top: 1, 5em;
-        }
-
-        .swal2-popup {
-            color: rgb(0, 0, 0);
-        }
-
-        .swal2-title {
-            color: #1a6e6e !important;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: linear-gradient(45deg, #33b1b1, #1a6e6e);
-            overflow: hidden;
-            position: relative;
-        }
-
-        header {
-            margin-top: 2em;
-            margin-bottom: -1em;
-        }
-
-        h1 {
-            font-weight: normal;
-            font-size: 2em;
-            margin-top: -1em;
-            margin-bottom: 2em;
-            text-align: center;
-            color: white;
-        }
-
-        h2 {
-            font-weight: normal;
-            font-size: 1.5em;
-            margin-top: -1em;
-            font: "Futura";
-            text-align: center;
-            color: white;
-        }
-
-        #camera-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
-        }
-
-        #video-container {
-            width: 100%;
-            max-width: 40vw;
-            margin: 0 auto;
-            overflow: hidden;
-        }
-
-        video {
-            width: 100%;
-            height: auto;
-            max-height: 50vh;
-            border: 5px solid white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-        }
-
-        #cameraSelector {
-            margin-bottom: 20px;
-            color: rgb(17, 13, 13);
-        }
-
-        .mensaje-personalizado {
-            text-align: left;
-            color: rgb(9, 7, 7);
-        }
-
-        .mi-boton-clase {
-            background-color: #ff7675;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .mi-boton-clase:hover {
-            background-color: #d63031;
-        }
-
-        .amarillo {
-            font-weight: bold;
-            color: #F2BC08;
-            font-style: italic;
-        }
-
-        .centrar {
-            text-align: center;
-        }
-
-        footer {
-            margin-top: 3em;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lector de QR</title>
+  <script src="https://rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
 </head>
-
 <body>
-    <header>
-        <img id="logo" src="img/Logo.png" alt="Logo" />
-    </header>
 
-    <div class="centrar">
-        <h1>ESCANEÁ EL <strong class="amarillo">QR</strong> <br> DEL PRODUCTO QUE DESEAS Y <br> <strong
-                class="amarillo">CONOCE SU PRECIO!</strong></h1>
-    </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const video = document.createElement('video');
+    video.setAttribute('playsinline', true);
+    document.body.appendChild(video);
 
-    <h2><label for="cameraSelector">SELECCIONE UNA <br>CÁMARA:</label></h2>
-    <select id="cameraSelector"></select>
+    const canvas = document.createElement('canvas');
+    const canvasContext = canvas.getContext('2d');
+    document.body.appendChild(canvas);
 
-    <!-- Video directamente en el HTML -->
-    <div id="camera-container">
-        <div id="video-container">
-            <video id="preview" playsinline></video>
-        </div>
-    </div>
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(function (stream) {
+        video.srcObject = stream;
+        video.play();
 
-    <footer></footer>
-
-    <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-    <script src="https://rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const video = document.getElementById('preview');
-            const canvas = document.createElement('canvas');
-            const canvasContext = canvas.getContext('2d');
-            document.body.appendChild(canvas);
-
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-                .then(function (stream) {
-                    video.srcObject = stream;
-                    video.play();
-
-                    video.addEventListener('loadedmetadata', function () {
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                        requestAnimationFrame(tick);
-                    });
-                })
-                .catch(function (error) {
-                    console.error('Error al acceder a la cámara:', error);
-                });
-
-            function tick() {
-                const container = document.getElementById('video-container');
-                const containerRect = container.getBoundingClientRect();
-                video.width = containerRect.width;
-                video.height = containerRect.height;
-
-                canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
-
-                const code = jsQR(imageData.data, imageData.width, imageData.height);
-                if (code) {
-                    alert('Contenido del código QR:\n' + code.data);
-                }
-
-                requestAnimationFrame(tick);
-            }
+        video.addEventListener('loadedmetadata', function () {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          requestAnimationFrame(tick);
         });
-    </script>
-</body>
+      })
+      .catch(function (error) {
+        console.error('Error al acceder a la cámara:', error);
+      });
 
+    function tick() {
+      canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code) {
+        // Mostrar alerta con el contenido del código QR
+        alert('Contenido del código QR:\n' + code.data);
+        
+
+      }
+
+      requestAnimationFrame(tick);
+    }
+  });
+</script>
+
+</body>
 </html>
