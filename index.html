@@ -167,7 +167,11 @@
     <h2><label for="cameraSelector">SELECCIONE UNA <br>CAMARA:</label></h2>
     <select id="cameraSelector"></select>
 
-    <video id="preview" class="video-back" playsinline></video>
+    <div id="qr-container">
+        
+        <video id="preview" class="video-back" playsinline></video>
+        <canvas style="display:none;"></canvas>
+    </div>
     <footer></footer>
 
     <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
