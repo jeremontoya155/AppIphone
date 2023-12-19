@@ -4,63 +4,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lector de QR</title>
-  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+  <script src="https://rawgit.com/serratus/quaggaJS/master/dist/quagga.min.js"></script>
 </head>
 <body>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const userAgent = navigator.userAgent.toLowerCase();
+    const startCameraButton = document.createElement('button');
+    startCameraButton.textContent = 'Iniciar Cámara';
+    document.body.appendChild(startCameraButton);
 
-    if (userAgent.includes('android') || userAgent.includes('windows')) {
-      alert('Ingreso desde Android o PC');
-    } else if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
-      const startCameraButton = document.createElement('button');
-      startCameraButton.textContent = 'Iniciar Cámara';
-      document.body.appendChild(startCameraButton);
+    function initCamera() {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(function (stream) {
+          const video = document.createElement('video');
+          video.srcObject = stream;
+          video.setAttribute('playsinline', true);
+          video.setAttribute('autoplay', true);
+          document.body.appendChild(video);
 
-      let video;
-      let scanner;
-
-      function initCamera() {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-          .then(function (stream) {
-            video = document.createElement('video');
-            video.srcObject = stream;
-            video.setAttribute('playsinline', true);
-            video.setAttribute('autoplay', true);
-            document.body.appendChild(video);
-
-            scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-            scanner.addListener('scan', function (content) {
-              // Detener la detección después de encontrar un código
-              scanner.stop();
-              // Mostrar alerta con el contenido del código
-              alert('Contenido del código QR:\n' + content);
-            });
-
-            // Iniciar la detección de códigos QR
-            Instascan.Camera.getCameras().then(function (cameras) {
-              if (cameras.length > 0) {
-                scanner.start(cameras[0]); // Puedes cambiar a otra cámara si es necesario
-              } else {
-                console.error('No se encontraron cámaras disponibles.');
-              }
-            }).catch(function (error) {
-              console.error('Error al acceder a la cámara:', error);
-            });
-          })
-          .catch(function (error) {
-            console.error('Error al acceder a la cámara:', error);
+          // Inicializar QuaggaJS
+          Quagga.init({
+            inputStream: {
+              name: 'Live',
+              type: 'LiveStream',
+              target: video,
+            },
+            decoder: {
+              readers: ['qrcode'],
+            },
+          }, function (err) {
+            if (err) {
+              console.error('Error al inicializar Quagga:', err);
+              return;
+            }
+            // Iniciar la detección
+            Quagga.start();
           });
-      }
 
-      startCameraButton.addEventListener('click', function () {
-        if (!video) {
-          initCamera();
-        }
-      });
+          // Escuchar eventos de detección
+          Quagga.onDetected(function (result) {
+            // Detener la detección después de encontrar un código
+            Quagga.stop();
+            // Mostrar alerta con el contenido del código
+            alert('Contenido del código QR:\n' + result.codeResult.code);
+          });
+        })
+        .catch(function (error) {
+          console.error('Error al acceder a la cámara:', error);
+        });
     }
+
+    startCameraButton.addEventListener('click', function () {
+      initCamera();
+    });
   });
 </script>
 
