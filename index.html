@@ -15,11 +15,18 @@
 
     #qr-container {
       position: relative;
+      width: 50vw; /* Ajusta el ancho del contenedor al 50% del viewport width */
+      height: 50vw; /* Ajusta la altura proporcionalmente */
+      max-width: 300px; /* Limita el ancho máximo a 300px */
+      max-height: 300px; /* Limita la altura máxima a 300px */
+      overflow: hidden; /* Asegura que el contenido no se desborde */
+      border: 10px solid white; /* Borde blanco con grosor de 10px */
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); /* Sombra brillante */
     }
 
     video {
       width: 100%;
-      height: auto;
+      height: 100%;
       display: block;
     }
 
@@ -31,6 +38,7 @@
       color: white;
       font-family: Arial, sans-serif;
       text-align: center;
+      z-index: 1; /* Asegura que el h1 esté encima del video */
     }
   </style>
   <script src="https://rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
