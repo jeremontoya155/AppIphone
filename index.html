@@ -59,6 +59,7 @@
             height: 100vh;
             background: linear-gradient(45deg, #33b1b1, #1a6e6e);
             overflow: hidden;
+            position: relative; /* Agrega esta propiedad */
         }
 
         header {
@@ -85,11 +86,26 @@
         }
 
         video {
-            margin-bottom: 4em;
+            width: 100%;
+            height: auto;
+            max-height: 50vh;
+            border: 5px solid white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        #camera-container {
+            position: absolute; /* Agrega esta propiedad */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #video-container {
-            position: relative;
             width: 100%;
             max-width: 40vw;
             margin: 0 auto;
@@ -157,8 +173,10 @@
     <select id="cameraSelector"></select>
 
     <!-- Agrega un contenedor para el video -->
-    <div id="video-container">
-        <video id="preview" playsinline></video>
+    <div id="camera-container">
+        <div id="video-container">
+            <video id="preview" playsinline></video>
+        </div>
     </div>
 
     <footer></footer>
