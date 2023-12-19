@@ -241,8 +241,21 @@ if (esIPhone) {
         const code = jsQR(imageData.data, imageData.width, imageData.height);
         if (code) {
           // Parsear el JSON
-          alert(typeof(code.data))
-          alert(code.data)
+          try {
+            const objetoJSON = JSON.parse(code.data);
+
+// Ahora, objetoJSON se comporta como un diccionario
+// Acceder al valor de la propiedad "Codigo de barra"
+const codigoDeBarras = objetoJSON["Codigo de barra"];
+
+// Mostrar alerta con el contenido del código de barras
+alert('Código de Barras:\n' + codigoDeBarras);
+            
+          } catch (error) {
+            
+            alert(code.data)
+          }
+          
         }
 
         requestAnimationFrame(tick);
