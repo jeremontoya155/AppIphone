@@ -3,19 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Escáner QR para iPhone</title>
-  <style>
-    #preview {
-      width: 100%;
-    }
-  </style>
+  <title>Detección de Sistema Operativo</title>
 </head>
 <body>
-  <video id="preview" playsinline autoplay muted></video>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const video = document.getElementById('preview');
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Detectar el tipo de sistema operativo
+    const userAgent = navigator.userAgent.toLowerCase();
+    
+    if (userAgent.includes('android') || userAgent.includes('windows')) {
+      // Si es Android o PC, muestra un alert
+      alert('Ingreso desde Android o PC');
+    } else if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
+      // Si es un dispositivo iOS, inicia la cámara como se mostró anteriormente
+      const video = document.createElement('video');
+      document.body.appendChild(video);
 
       function initCamera() {
         navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
@@ -46,7 +49,9 @@
       document.body.addEventListener('click', function () {
         initCamera();
       });
-    });
-  </script>
+    }
+  });
+</script>
+
 </body>
 </html>
