@@ -216,19 +216,10 @@
     function tick() {
       canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
-
-       // Cargar datos desde el archivo Base.json
-    fetch('Base.json')
-        .then(response => response.json())
-        .then(datos_lista => {
       const code = jsQR(imageData.data, imageData.width, imageData.height);
-      if (code) {
-        // Mostrar alerta con el contenido del código QR
-        alert('Contenido del código QR:\n' + code.data);
-      }
-
-      requestAnimationFrame(tick);
-    })}
+    alert(code.data)
+   
+  }
                
             } 
             else {
