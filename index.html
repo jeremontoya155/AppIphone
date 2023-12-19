@@ -28,6 +28,8 @@
           alert('Contenido del código QR:\n' + content);
         });
 
+        //Camvios de configuracion
+        
         Instascan.Camera.getCameras().then(function (cameras) {
           if (cameras.length > 0) {
             scanner.start(cameras[0]); // Puedes cambiar a otra cámara si es necesario
