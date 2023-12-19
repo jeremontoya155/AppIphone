@@ -4,8 +4,158 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detección de Sistema Operativo</title>
+
+
+
+
+</head>
+<style>
+    @font-face {
+  font-family: 'Futura';
+  src: url('fonts/futura\ medium\ bt.ttf') format('truetype');
+  /* Agrega más formatos de fuente según sea necesario (woff, woff2, etc.) */
+}
+
+* {
+  font-family: 'Futura', sans-serif;
+  /* Puedes aplicar la fuente a todo el cuerpo del documento o a elementos específicos */
+}
+
+        /* Agrega este bloque de estilo */
+        .mi-popup-clase {
+        background-color: white !important;
+        color: black !important;
+    }
+
+    .custom-confirm-button {
+    background-color: #1a6e6e!important ;/* Cambia estos valores según tu preferencia */
+    color: #fff; /* Color del texto */
+    /* Otros estilos que desees aplicar */
+}
+    .mi-titulo-clase {
+        color: black !important;
+    }
+    #logo {
+            max-width: 30em; /* Tamaño máximo del logo */
+            width: 100%; /* Hacer la imagen responsive */
+            height: auto;
+            margin-top: 1,5em;
+        }
+    .swal2-popup {
+    color:rgb(0, 0, 0);
+    }
+    
+    .swal2-title {
+    color: #1a6e6e !important;
+    }
+    
+    body {
+   
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(45deg, #33b1b1, #1a6e6e); /* Fondo con degradado */
+    overflow: hidden;
+    }
+    
+
+    header{
+        margin-top:2em ;
+        margin-bottom: -1em;
+    }
+    h1 {
+        font-weight: normal; /* Para quitar la negrita */
+
+    font-size: 2em;
+    margin-top:-1em ;
+    margin-bottom: 2em;
+    text-align: center;
+    color: white; /* Color del texto blanco */
+    /*text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Sombra de texto */
+    
+    }
+    h2 {
+        font-weight: normal; /* Para quitar la negrita */
+
+    font-size: 1.5em;
+    margin-top:-1em ;
+    font: "Futura";
+    text-align: center;
+    color: white; /* Color del texto blanco */
+    /*text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Sombra de texto */
+    }
+    
+    video{margin-bottom:4em ;}
+
+      #preview {
+            width: 100%;
+            max-width: 40vw; /* Usar unidades relativas para el ancho máximo */
+            max-height: 50vh; /* Usar unidades relativas para la altura máxima */
+            margin-bottom: 5em;
+            border: 5px solid white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+    
+    #cameraSelector {
+    margin-bottom: 20px;
+    color: rgb(17, 13, 13); /* Color del texto blanco */
+    }
+    
+    /* Estilo para el mensaje personalizado de SweetAlert */
+    .mensaje-personalizado {
+    text-align: left;
+    color: rgb(9, 7, 7);
+    }
+    
+    /* Estilo adicional para el botón de SweetAlert */
+    .mi-boton-clase {
+    background-color: #ff7675; /* Color de fondo */
+    color: white; /* Color del texto */
+    border: none; /* Sin borde */
+    padding: 10px 20px; /* Espaciado interno */
+    border-radius: 5px; /* Esquinas redondeadas */
+    cursor: pointer;
+    transition: background-color 0.3s; /* Transición suave */
+    }
+    
+    .mi-boton-clase:hover {
+    background-color: #d63031; /* Cambiar color en el hover */
+    }
+    .amarillo {
+            font-weight: bold;
+            color: #F2BC08; /* O el color que desees */
+            font-style: italic; /* Para aplicar la cursiva */
+
+        }
+
+    .centrar {
+            text-align: center;
+            
+        }
+    footer{
+        margin-top: 3em;
+    }
+    </style>
 </head>
 <body>
+    <header><img id="logo" src="img/Logo.png" alt="Logo" />
+    </header>
+
+    <div class="centrar"><h1>ESCANEÁ EL <strong class="amarillo">QR</strong> <br> DEL PRODUCTO QUE DESEAS Y <br> <strong class="amarillo">CONOCE SU PRECIO!</strong></h1>
+    </div>    
+    
+    <!-- Selector de cámaras -->
+    <h2><label for="cameraSelector">SELECCIONE UNA <br>CAMARA:</label></h2>
+    <select id="cameraSelector"></select>
+    
+    <video id="preview" class="video-back" playsinline></video>
+    <footer></footer>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
