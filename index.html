@@ -3,114 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lector Farmacia Sanchez Antoniolli</title>
-  <link rel="icon" type="image/png" href="img/Logo.png"/>
-  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-  <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-  <style>
-    /* Estilos adicionales según tu preferencia */
-  </style>
+  <title>Detección de Sistema Operativo</title>
 </head>
 <body>
-  <header><img id="logo" src="img/Logo.png" alt="Logo" /></header>
 
-  <div><h1>ESCANEÁ EL <strong class="amarillo">QR</strong> <br> DEL PRODUCTO QUE DESEAS Y <br> <strong class="amarillo">CONOCE SU PRECIO!</strong></h1></div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Detectar el tipo de sistema operativo
+    const userAgent = navigator.userAgent.toLowerCase();
+    
+    if (userAgent.includes('android') || userAgent.includes('windows')) {
+      // Si es Android o PC, muestra un alert
+      alert('Ingreso desde Android o PC');
+    } else if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
+      // Si es un dispositivo iOS, muestra un botón para iniciar la cámara
+      const startCameraButton = document.createElement('button');
+      startCameraButton.textContent = 'Iniciar Cámara';
+      document.body.appendChild(startCameraButton);
 
-  <!-- Selector de cámaras -->
-  <h2><label for="cameraSelector">SELECCIONE UNA <br>CAMARA:</label></h2>
-  <select id="cameraSelector"></select>
+      let video;
 
-  <video id="preview" class="video-back" playsinline></video>
-  <footer></footer>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const cameraSelector = document.getElementById('cameraSelector');
-      const userAgent = navigator.userAgent.toLowerCase();
-
-      const constraints = {
-        video: {
-          facingMode: "environment" // Forzar la cámara trasera
-        }
-      };
-
-      let scanner;
-
-      if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
-        // Iniciar el escáner de código QR para iOS
-        scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
-
-        // Configuración e inicialización del lector
-        Instascan.Camera.getCameras().then(function (cameras) {
-          if (cameras.length > 0) {
-            // Tomar la última cámara como primera instancia
-            const selectedCamera = cameras[cameras.length - 1];
-
-            // Llenar el selector de cámaras
-            cameras.forEach((camera, index) => {
-              const option = document.createElement('option');
-              option.value = index;
-              option.text = camera.name || `Cámara ${index + 1}`;
-              cameraSelector.add(option);
-            });
-
-            // Actualizar el lector cuando se cambia la cámara
-            cameraSelector.addEventListener('change', function () {
-              const selectedCamera = cameras[cameraSelector.value];
-              scanner.start(selectedCamera);
-            });
-
-            // Iniciar el lector con la cámara seleccionada
-            scanner.start(selectedCamera);
-          } else {
-            console.error('No se encontraron cámaras en el dispositivo.');
-          }
-        }).catch(function (e) {
-          console.error(e);
-        });
-      } else if (userAgent.includes('android') || userAgent.includes('windows')) {
-        // Iniciar el escáner de código QR para Android y Windows
-        scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
-
-        // Cargar datos desde el archivo Base.json
-        fetch('Base.json')
-          .then(response => response.json())
-          .then(datos_lista => {
-            scanner.addListener('scan', function (content) {
-              // Tu lógica para manejar el código QR en Windows y Android
-              // ...
-            });
-
-            Instascan.Camera.getCameras().then(function (cameras) {
-              if (cameras.length > 0) {
-                const selectedCamera = cameras[cameras.length - 1];
-
-                cameras.forEach((camera, index) => {
-                  const option = document.createElement('option');
-                  option.value = index;
-                  option.text = camera.name || `Cámara ${index + 1}`;
-                  cameraSelector.add(option);
-                });
-
-                cameraSelector.addEventListener('change', function () {
-                  const selectedCamera = cameras[cameraSelector.value];
-                  scanner.start(selectedCamera);
-                });
-
-                scanner.start(selectedCamera);
-              } else {
-                console.error('No se encontraron cámaras en el dispositivo.');
-              }
-            }).catch(function (e) {
-              console.error(e);
-            });
+      function initCamera() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+          .then(function (stream) {
+            video = document.createElement('video');
+            video.srcObject = stream;
+            video.setAttribute('playsinline', true);
+            video.setAttribute('autoplay', true);
+            document.body.appendChild(video);
           })
-          .catch(error => console.error('Error al cargar los datos:', error));
-      } else {
-        console.error('Dispositivo no compatible.');
+          .catch(function (error) {
+            console.error('Error al acceder a la cámara:', error);
+          });
       }
-    });
-  </script>
+
+      // Solicitar acceso a la cámara cuando el usuario haga clic en el botón
+      startCameraButton.addEventListener('click', function () {
+        if (!video) {
+          initCamera();
+        }
+      });
+    }
+  });
+</script>
+
 </body>
 </html>
