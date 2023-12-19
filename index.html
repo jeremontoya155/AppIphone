@@ -4,53 +4,47 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lector de QR</title>
+  <script src="https://rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
 </head>
 <body>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*'; // Acepta archivos de imagen
+    const video = document.createElement('video');
+    video.setAttribute('playsinline', true);
+    document.body.appendChild(video);
 
-    const startReaderButton = document.createElement('button');
-    startReaderButton.textContent = 'Iniciar Lector QR';
-    document.body.appendChild(startReaderButton);
+    const canvas = document.createElement('canvas');
+    const canvasContext = canvas.getContext('2d');
+    document.body.appendChild(canvas);
 
-    startReaderButton.addEventListener('click', function () {
-      fileInput.click(); // Hacer clic en el input de archivo al hacer clic en el botón
-    });
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(function (stream) {
+        video.srcObject = stream;
+        video.play();
 
-    fileInput.addEventListener('change', function (event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
+        video.addEventListener('loadedmetadata', function () {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          requestAnimationFrame(tick);
+        });
+      })
+      .catch(function (error) {
+        console.error('Error al acceder a la cámara:', error);
+      });
 
-        reader.onload = function (e) {
-          const image = new Image();
-          image.src = e.target.result;
+    function tick() {
+      canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
 
-          image.onload = function () {
-            const barcodeDetector = new BarcodeDetector();
-
-            barcodeDetector.detect(image)
-              .then(barcodes => {
-                if (barcodes.length > 0) {
-                  // Mostrar alerta con el contenido del código QR
-                  alert('Contenido del código QR:\n' + barcodes[0].rawValue);
-                } else {
-                  alert('No se encontraron códigos QR en la imagen.');
-                }
-              })
-              .catch(error => {
-                console.error('Error al detectar códigos QR:', error);
-              });
-          };
-        };
-
-        reader.readAsDataURL(file);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code) {
+        // Mostrar alerta con el contenido del código QR
+        alert('Contenido del código QR:\n' + code.data);
       }
-    });
+
+      requestAnimationFrame(tick);
+    }
   });
 </script>
 
