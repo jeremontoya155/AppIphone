@@ -197,7 +197,21 @@
 
             if (esIPhone) {
     
-                const video = document.querySelector('video');
+                
+  // Selector de cámaras
+  const cameraSelector = document.getElementById('cameraSelector');
+
+const constraints = {
+  video: {
+    facingMode: "environment" // Forzar la cámara trasera
+  }
+};
+
+// Configuración e inicialización del lector
+let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
+
+if (esIPhone) {
+  const video = document.querySelector('video');
   const canvas = document.querySelector('canvas');
   const canvasContext = canvas.getContext('2d');
 
@@ -219,16 +233,24 @@
   function tick() {
     canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
     const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(imageData.data, imageData.width, imageData.height);
 
-    if (code) {
-      // Si se detecta un código QR, muestra el valor en un alert
-      alert('Valor del código QR: ' + code.data);
-    }
+    // Cargar datos desde el archivo Base.json
+    fetch('Base.json')
+      .then(response => response.json())
+      .then(datos_lista => {
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        if (code) {
+          // Parsear el JSON
+          const codigoDeBarras = JSON.parse(code.data)["Codigo de barra"];
 
-    // Sigue actualizando el fotograma
-    requestAnimationFrame(tick);
+          // Mostrar alerta con el contenido del código de barras
+          alert('Código de Barras:\n' + codigoDeBarras);
+        }
+
+        requestAnimationFrame(tick);
+      });
   }
+}
                
             } 
             else {
