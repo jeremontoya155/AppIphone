@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lector de QR</title>
-  <script src="https://unpkg.com/@zxing/library@0.23.0"></script>
+  <script src="https://rawgit.com/serratus/quaggaJS/master/dist/quagga.min.js"></script>
 </head>
 <body>
 
@@ -12,9 +12,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     const userAgent = navigator.userAgent.toLowerCase();
 
-    if (userAgent.includes('android') || userAgent.includes('windows')) {
-      alert('Ingreso desde Android o PC');
-    } else if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
+    if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
       const startCameraButton = document.createElement('button');
       startCameraButton.textContent = 'Iniciar Cámara';
       document.body.appendChild(startCameraButton);
@@ -30,16 +28,34 @@
             video.setAttribute('autoplay', true);
             document.body.appendChild(video);
 
-            const codeReader = new ZXing.BrowserQRCodeReader();
-
-            codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
-              if (result) {
-                // Código QR leído con éxito
-                alert('Contenido del código QR:\n' + JSON.stringify(result.getText()));
-              } else {
-                // Manejar el error, si es necesario
-                console.error('Error al leer el código QR:', err);
+            // Inicializar QuaggaJS
+            Quagga.init({
+              inputStream: {
+                name: 'Live',
+                type: 'LiveStream',
+                target: video,
+                constraints: {
+                  facingMode: 'environment',
+                },
+              },
+              decoder: {
+                readers: ['code_128_reader', 'ean_reader', 'ean_8_reader', 'code_39_reader', 'code_39_vin_reader', 'codabar_reader', 'upc_reader', 'upc_e_reader', 'i2of5_reader', '2of5_reader', 'code_93_reader'],
+              },
+            }, function (err) {
+              if (err) {
+                console.error('Error al inicializar Quagga:', err);
+                return;
               }
+              // Iniciar la detección
+              Quagga.start();
+            });
+
+            // Escuchar eventos de detección
+            Quagga.onDetected(function (result) {
+              // Detener la detección después de encontrar un código
+              Quagga.stop();
+              // Mostrar alerta con el contenido del código
+              alert('Contenido del código QR:\n' + result.codeResult.code);
             });
           })
           .catch(function (error) {
