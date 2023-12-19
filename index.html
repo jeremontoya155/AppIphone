@@ -3,20 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detección de Sistema Operativo</title>
+  <title>Lector de QR</title>
+  <script src="https://unpkg.com/@zxing/library@0.23.0"></script>
 </head>
 <body>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Detectar el tipo de sistema operativo
     const userAgent = navigator.userAgent.toLowerCase();
-    
+
     if (userAgent.includes('android') || userAgent.includes('windows')) {
-      // Si es Android o PC, muestra un alert
       alert('Ingreso desde Android o PC');
     } else if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
-      // Si es un dispositivo iOS, muestra un botón para iniciar la cámara
       const startCameraButton = document.createElement('button');
       startCameraButton.textContent = 'Iniciar Cámara';
       document.body.appendChild(startCameraButton);
@@ -31,13 +29,24 @@
             video.setAttribute('playsinline', true);
             video.setAttribute('autoplay', true);
             document.body.appendChild(video);
+
+            const codeReader = new ZXing.BrowserQRCodeReader();
+
+            codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
+              if (result) {
+                // Código QR leído con éxito
+                alert('Contenido del código QR:\n' + JSON.stringify(result.getText()));
+              } else {
+                // Manejar el error, si es necesario
+                console.error('Error al leer el código QR:', err);
+              }
+            });
           })
           .catch(function (error) {
             console.error('Error al acceder a la cámara:', error);
           });
       }
 
-      // Solicitar acceso a la cámara cuando el usuario haga clic en el botón
       startCameraButton.addEventListener('click', function () {
         if (!video) {
           initCamera();
