@@ -59,7 +59,7 @@
             height: 100vh;
             background: linear-gradient(45deg, #33b1b1, #1a6e6e);
             overflow: hidden;
-            position: relative; 
+            position: relative;
         }
 
         header {
@@ -101,7 +101,7 @@
             width: 100%;
             max-width: 40vw;
             margin: 0 auto;
-            overflow: hidden; /* Agregado para ocultar contenido adicional */
+            overflow: hidden;
         }
 
         video {
@@ -159,16 +159,17 @@
     </header>
 
     <div class="centrar">
-        <h1>ESCANEÁ EL <strong class="amarillo">QR</strong> <br> DEL PRODUCTO QUE DESEAS Y <br> <strong class="amarillo">CONOCE SU PRECIO!</strong></h1>
+        <h1>ESCANEÁ EL <strong class="amarillo">QR</strong> <br> DEL PRODUCTO QUE DESEAS Y <br> <strong
+                class="amarillo">CONOCE SU PRECIO!</strong></h1>
     </div>
 
     <h2><label for="cameraSelector">SELECCIONE UNA <br>CÁMARA:</label></h2>
     <select id="cameraSelector"></select>
 
-    <!-- Agrega un contenedor para el video -->
+    <!-- Video directamente en el HTML -->
     <div id="camera-container">
         <div id="video-container">
-           
+            <video id="preview" playsinline></video>
         </div>
     </div>
 
