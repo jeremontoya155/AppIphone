@@ -255,7 +255,9 @@ alert('Código de Barras:\n' + codigoDeBarras);
             let dato=code.data
             let valor=dato.replace(/'/g, '"')
             var valorPrueba = valor.replace(/(\w+)\s*:/g, '"$1":');
-            alert(valorPrueba)
+            var valorUsar = eval('(' + valorPrueba + ')');
+
+            alert(valorUsar)
             
             //alert(code.data)
             alert(code.data[0])
