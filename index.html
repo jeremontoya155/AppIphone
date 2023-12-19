@@ -190,45 +190,44 @@
             let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
 
             if (esIPhone) {
-                // Acciones específicas para iPhone // Acciones específicas para iPhone
-    const constraints = {
-        video: {
-            facingMode: "environment" // Forzar la cámara trasera
-        }
-    };
+                const video = document.querySelector('video');
+    const canvas = document.querySelector('canvas');
+    const canvasContext = canvas.getContext('2d');
 
-    navigator.mediaDevices.getUserMedia(constraints)
-        .then(function (stream) {
-            const video = document.createElement('video');
-            document.body.appendChild(video);
-            video.srcObject = stream;
-            video.play();
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(function (stream) {
+        video.srcObject = stream;
+        video.play();
 
-            const canvas = document.createElement('canvas');
-            const canvasContext = canvas.getContext('2d');
-
-            video.addEventListener('loadedmetadata', function () {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-
-                setInterval(function () {
-                    canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
-
-                    const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-                    if (code) {
-                        // Código QR detectado, puedes acceder al valor con code.data
-                        alert(`Código QR detectado: ${code.data}`);
-                    }
-                }, 1000); // Captura cada segundo
-            });
-        })
-        .catch(function (error) {
-            console.error('Error al acceder a la cámara:', error);
+        video.addEventListener('loadedmetadata', function () {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          requestAnimationFrame(tick);
         });
+      })
+      .catch(function (error) {
+        console.error('Error al acceder a la cámara:', error);
+      });
+
+    function tick() {
+      canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+
+       // Cargar datos desde el archivo Base.json
+    fetch('Base.json')
+        .then(response => response.json())
+        .then(datos_lista => {
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code) {
+        // Mostrar alerta con el contenido del código QR
+        alert('Contenido del código QR:\n' + code.data);
+      }
+
+      requestAnimationFrame(tick);
+    })}
                
-            } else {
+            } 
+            else {
                 // Cargar datos desde el archivo Base.json
                 fetch('Base.json')
                     .then(response => response.json())
