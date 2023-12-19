@@ -15,45 +15,79 @@
     document.body.appendChild(startCameraButton);
 
     function initCamera() {
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-        .then(function (stream) {
-          const video = document.createElement('video');
-          video.srcObject = stream;
-          video.setAttribute('playsinline', true);
-          video.setAttribute('autoplay', true);
-          document.body.appendChild(video);
+      Quagga.init({
+        inputStream: {
+          name: 'Live',
+          type: 'LiveStream',
+        },
+        decoder: {
+          readers: ['qrcode'],
+        },
+      }, function (err) {
+        if (err) {
+          console.error('Error al inicializar Quagga:', err);
+          return;
+        }
+        Quagga.start();
+      });
 
-          // Inicializar QuaggaJS
-          Quagga.init({
-            inputStream: {
-              name: 'Live',
-              type: 'LiveStream',
-              target: video,
-            },
-            decoder: {
-              readers: ['qrcode'],
-            },
-          }, function (err) {
-            if (err) {
-              console.error('Error al inicializar Quagga:', err);
-              return;
-            }
-            // Iniciar la detección
-            Quagga.start();
-          });
+      Quagga.onDetected(function (result) {
+        // Detener la detección después de encontrar un código
+        Quagga.stop();
+        // Mostrar alerta con el contenido del código
+        alert('Contenido del código QR:\n' + result.codeResult.code);
+      });
 
-          // Escuchar eventos de detección
-          Quagga.onDetected(function (result) {
-            // Detener la detección después de encontrar un código
-            Quagga.stop();
-            // Mostrar alerta con el contenido del código
-            alert('Contenido del código QR:\n' + result.codeResult.code);
-          });
-        })
-        //Cambios en la app
-        .catch(function (error) {
-          console.error('Error al acceder a la cámara:', error);
-        });
+      Quagga.onProcessed(function (result) {
+        const drawingCtx = Quagga.canvas.ctx.overlay;
+        const drawingCanvas = Quagga.canvas.dom.overlay;
+
+        if (result) {
+          if (result.boxes) {
+            drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute('width')), parseInt(drawingCanvas.getAttribute('height')));
+            result.boxes.filter(function (box) {
+              return box !== result.box;
+            }).forEach(function (box) {
+              Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, { color: 'green', lineWidth: 2 });
+            });
+          }
+
+          if (result.box) {
+            Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, { color: 'blue', lineWidth: 2 });
+          }
+
+          if (result.codeResult && result.codeResult.code) {
+            Quagga.ImageDebug.drawPath(result.line, { x: 'start', y: 'y' }, drawingCtx, { color: 'red', lineWidth: 3 });
+          }
+        }
+      });
+
+      Quagga.onProcessed(function (result) {
+        const drawingCtx = Quagga.canvas.ctx.overlay;
+        const drawingCanvas = Quagga.canvas.dom.overlay;
+
+        if (result) {
+          if (result.boxes) {
+            drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute('width')), parseInt(drawingCanvas.getAttribute('height')));
+            result.boxes.filter(function (box) {
+              return box !== result.box;
+            }).forEach(function (box) {
+              Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, { color: 'green', lineWidth: 2 });
+            });
+          }
+
+          if (result.box) {
+            Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, { color: 'blue', lineWidth: 2 });
+          }
+
+          if (result.codeResult && result.codeResult.code) {
+            Quagga.ImageDebug.drawPath(result.line, { x: 'start', y: 'y' }, drawingCtx, { color: 'red', lineWidth: 3 });
+          }
+        }
+      });
+
+      // Iniciar la cámara al hacer clic en el botón
+      Quagga.start();
     }
 
     startCameraButton.addEventListener('click', function () {
