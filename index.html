@@ -173,23 +173,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 cameraSelector.add(option);
             });
 
+            // Inicializar la cámara con la primera disponible
             const constraints = {
                 video: {
-                    deviceId: { exact: videoDevices[cameraSelector.value].deviceId },
+                    deviceId: { exact: videoDevices[0].deviceId },
                     facingMode: "environment"
                 }
             };
 
+            return navigator.mediaDevices.getUserMedia(constraints);
+        })
+        .then(stream => {
+            preview.srcObject = stream;
+            preview.play();
+
             // Configuración e inicialización del lector
             let scanner = new Instascan.Scanner({ video: preview, mirror: false });
 
-            navigator.mediaDevices.getUserMedia(constraints)
-                .then(stream => {
-                    preview.srcObject = stream;
-                    preview.play();
-                    scanner.addListener('scan', handleQrCode);
-                })
-                .catch(error => console.error('Error al acceder a la cámara:', error));
+            scanner.addListener('scan', handleQrCode);
 
             // Actualizar el lector cuando se cambia la cámara
             cameraSelector.addEventListener('change', function () {
