@@ -245,7 +245,88 @@ if (esIPhone) {
             let dato=code.data
             let valor=dato.replace(/'/g, '"')
             var valorPrueba = valor.replace(/(\w+)\s*:/g, '"$1":');
-            var valorUsar = eval('(' + valorPrueba + ')');
+            var objetoDesdeString = eval('(' + valorPrueba + ')');
+
+              // Buscar el producto en la base de datos
+              const codigoBarraEscaneado = objetoDesdeString["Codigo de barra"];
+                const productoEncontrado = datos_lista.find(producto => producto["Codigo de barra"] === codigoBarraEscaneado);
+
+                let mensajeAlerta,m1,m2,m3;
+
+                if (productoEncontrado) {
+                    const detalle = productoEncontrado.Detalle;
+                    const precio = productoEncontrado.Precio;
+                    const descuento= productoEncontrado.Descuento;
+                    const precioConDescuento = productoEncontrado["Precio Con Descuento"];
+
+                    if (precio === precioConDescuento || descuento==="A" ) {
+                        console.log(typeof(precio))
+                        let precioMuestra=parseInt(precio)
+                        //mensajeAlerta = `EL producto seleccionado es: ${detalle}\n\nPRECIO: $${precio}`;
+                        /*m1="Producto seleccionado "+detalle+"\n"
+                        m2="Precio de:"+precio+"\n"
+                        mensajeAlerta=m1+m2*/
+                        Swal.fire({
+        title: `${detalle}`,
+        text: `PRECIO: $${precioMuestra}`,
+        confirmButtonText: 'OK',
+        customClass: {
+            confirmButton: 'custom-confirm-button',
+            content: 'custom-swal-content',
+            // Clase CSS personalizada para el contenido
+        },
+    });
+
+                    } else {
+                        let mostrar=parseInt(precio)
+                        if (descuento.length>3) {
+                            Swal.fire({
+        title: `${detalle}`,
+        html: `<div><strong>Precio</strong>: $${mostrar}<br></div>
+        <div><strong>DESCUENTO</strong>:${descuento}<br></div>`,
+        confirmButtonText: 'OK',
+        customClass: {
+            confirmButton: 'custom-confirm-button',
+            content: 'custom-swal-content', // Clase CSS personalizada para el contenido
+        }
+        ,
+    });
+                            
+                        } else {
+                            let pDescuento=parseInt(precioConDescuento)
+                            let pFinal=parseInt(precio)
+                            console.log(typeof(precio))
+                       // mensajeAlerta = `EL producto seleccionado es: ${detalle}\n\n\nPrecio: $${precio}\n\n\nPrecio con Descuento: $${precioConDescuento}`;     
+                       /*m1="Producto seleccionado "+detalle+"\n"
+                        m2="Precio de:$"+precio+"\n"
+                    m3="Precio con descuento:$"+precioConDescuento+"\n"         
+                    mensajeAlerta=m1+m2+m3*/
+                    Swal.fire({
+        title: `${detalle}`,
+        html: `<div><strong>Precio</strong>: $${pFinal}<br></div>
+        <div><strong>DESCUENTO</strong>:%${descuento}<br></div>
+        <div><strong>Precio Final</strong>:$${pDescuento}<br></div>`,
+        confirmButtonText: 'OK',
+        customClass: {
+            confirmButton: 'custom-confirm-button',
+            content: 'custom-swal-content', // Clase CSS personalizada para el contenido
+        }
+        ,
+    });
+                            
+                        }
+
+
+                       
+                }
+                } else {
+                    mensajeAlerta = "Producto no encontrado en la base de datos.";
+                    alert(mensajeAlerta)
+                }
+
+
+
+
             
           } catch (error) {
             alert("Entro en el error")
@@ -253,6 +334,7 @@ if (esIPhone) {
             let valor=dato.replace(/'/g, '"')
             var valorPrueba = valor.replace(/(\w+)\s*:/g, '"$1":');
             var valorUsar = eval('(' + valorPrueba + ')');
+            
 
             
             
