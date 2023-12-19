@@ -194,31 +194,38 @@
             let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
 
             if (esIPhone) {
+    
                 const video = document.querySelector('video');
-    const canvas = document.querySelector('canvas');
-    const canvasContext = canvas.getContext('2d');
+  const canvas = document.querySelector('canvas');
+  const canvasContext = canvas.getContext('2d');
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(function (stream) {
-        video.srcObject = stream;
-        video.play();
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(function (stream) {
+      video.srcObject = stream;
+      video.play();
 
-        video.addEventListener('loadedmetadata', function () {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          requestAnimationFrame(tick);
-        });
-      })
-      .catch(function (error) {
-        console.error('Error al acceder a la cámara:', error);
+      video.addEventListener('loadedmetadata', function () {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        requestAnimationFrame(tick);
       });
+    })
+    .catch(function (error) {
+      console.error('Error al acceder a la cámara:', error);
+    });
 
-    function tick() {
-      canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
-    alert(code.data)
-   
+  function tick() {
+    canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+    if (code) {
+      // Si se detecta un código QR, muestra el valor en un alert
+      alert('Valor del código QR: ' + code.data);
+    }
+
+    // Sigue actualizando el fotograma
+    requestAnimationFrame(tick);
   }
                
             } 
