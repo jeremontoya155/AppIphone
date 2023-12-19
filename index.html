@@ -270,11 +270,12 @@ if (esIPhone) {
 
                 } else {
                     
-                    Swal.fire({
+                    let mostrar=parseInt(precio)
+                        if (descuento.length>3) {
+                            Swal.fire({
         title: `${detalle}`,
-        html: `<div><strong>Precio</strong>: $${precio}<br></div>
-        <div><strong>DESCUENTO</strong>:%${descuento}<br></div>
-        <div><strong>Precio Final</strong>:$${precioConDescuento}<br></div>`,
+        html: `<div><strong>Precio</strong>: $${mostrar}<br></div>
+        <div><strong>DESCUENTO</strong>:${descuento}<br></div>`,
         confirmButtonText: 'OK',
         customClass: {
             confirmButton: 'custom-confirm-button',
@@ -282,6 +283,30 @@ if (esIPhone) {
         }
         ,
     });
+                            
+                        } else {
+                            let pDescuento=parseInt(precioConDescuento)
+                            let pFinal=parseInt(precio)
+                            console.log(typeof(precio))
+                       // mensajeAlerta = `EL producto seleccionado es: ${detalle}\n\n\nPrecio: $${precio}\n\n\nPrecio con Descuento: $${precioConDescuento}`;     
+                       /*m1="Producto seleccionado "+detalle+"\n"
+                        m2="Precio de:$"+precio+"\n"
+                    m3="Precio con descuento:$"+precioConDescuento+"\n"         
+                    mensajeAlerta=m1+m2+m3*/
+                    Swal.fire({
+        title: `${detalle}`,
+        html: `<div><strong>Precio</strong>: $${pFinal}<br></div>
+        <div><strong>DESCUENTO</strong>:%${descuento}<br></div>
+        <div><strong>Precio Final</strong>:$${pDescuento}<br></div>`,
+        confirmButtonText: 'OK',
+        customClass: {
+            confirmButton: 'custom-confirm-button',
+            content: 'custom-swal-content', // Clase CSS personalizada para el contenido
+        }
+        ,
+    });
+                            
+                        }
                     
                 }
 
