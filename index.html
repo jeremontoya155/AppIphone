@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lector de QR</title>
-  <script src="https://rawgit.com/serratus/quaggaJS/master/dist/quagga.min.js"></script>
+  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 </head>
 <body>
 
@@ -14,85 +14,30 @@
     startCameraButton.textContent = 'Iniciar Cámara';
     document.body.appendChild(startCameraButton);
 
+    let scanner;
+
     function initCamera() {
-      Quagga.init({
-        inputStream: {
-          name: 'Live',
-          type: 'LiveStream',
-        },
-        decoder: {
-          readers: ['qrcode'],
-        },
-      }, function (err) {
-        if (err) {
-          console.error('Error al inicializar Quagga:', err);
-          return;
+      scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
+
+      Instascan.Camera.getCameras().then(function (cameras) {
+        if (cameras.length > 0) {
+          scanner.start(cameras[0]); // Cambiar a [1] para la cámara trasera
+        } else {
+          console.error('No se encontraron cámaras disponibles.');
         }
-        Quagga.start();
+      }).catch(function (error) {
+        console.error('Error al acceder a la cámara:', error);
       });
 
-      Quagga.onDetected(function (result) {
-        // Detener la detección después de encontrar un código
-        Quagga.stop();
-        // Mostrar alerta con el contenido del código
-        alert('Contenido del código QR:\n' + result.codeResult.code);
+      scanner.addListener('scan', function (content) {
+        alert('Contenido del código QR:\n' + content);
       });
-
-      Quagga.onProcessed(function (result) {
-        const drawingCtx = Quagga.canvas.ctx.overlay;
-        const drawingCanvas = Quagga.canvas.dom.overlay;
-
-        if (result) {
-          if (result.boxes) {
-            drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute('width')), parseInt(drawingCanvas.getAttribute('height')));
-            result.boxes.filter(function (box) {
-              return box !== result.box;
-            }).forEach(function (box) {
-              Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, { color: 'green', lineWidth: 2 });
-            });
-          }
-
-          if (result.box) {
-            Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, { color: 'blue', lineWidth: 2 });
-          }
-
-          if (result.codeResult && result.codeResult.code) {
-            Quagga.ImageDebug.drawPath(result.line, { x: 'start', y: 'y' }, drawingCtx, { color: 'red', lineWidth: 3 });
-          }
-        }
-      });
-
-      Quagga.onProcessed(function (result) {
-        const drawingCtx = Quagga.canvas.ctx.overlay;
-        const drawingCanvas = Quagga.canvas.dom.overlay;
-
-        if (result) {
-          if (result.boxes) {
-            drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute('width')), parseInt(drawingCanvas.getAttribute('height')));
-            result.boxes.filter(function (box) {
-              return box !== result.box;
-            }).forEach(function (box) {
-              Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, { color: 'green', lineWidth: 2 });
-            });
-          }
-
-          if (result.box) {
-            Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, { color: 'blue', lineWidth: 2 });
-          }
-
-          if (result.codeResult && result.codeResult.code) {
-            Quagga.ImageDebug.drawPath(result.line, { x: 'start', y: 'y' }, drawingCtx, { color: 'red', lineWidth: 3 });
-          }
-        }
-      });
-
-      // Iniciar la cámara al hacer clic en el botón
-      Quagga.start();
-    }//cambiamos
-    
+    }
 
     startCameraButton.addEventListener('click', function () {
-      initCamera();
+      if (!scanner) {
+        initCamera();
+      }
     });
   });
 </script>
