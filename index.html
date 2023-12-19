@@ -242,23 +242,19 @@ if (esIPhone) {
         if (code) {
           // Parsear el JSON
           try {
-            const objetoJSON = JSON.parse(code.data[1]);
-
-// Ahora, objetoJSON se comporta como un diccionario
-// Acceder al valor de la propiedad "Codigo de barra"
-const codigoDeBarras = objetoJSON[  "Codigo de barra"];
-
-// Mostrar alerta con el contenido del código de barras
-alert('Código de Barras:\n' + codigoDeBarras);
+            let dato=code.data
+            let valor=dato.replace(/'/g, '"')
+            var valorPrueba = valor.replace(/(\w+)\s*:/g, '"$1":');
+            var valorUsar = eval('(' + valorPrueba + ')');
             
           } catch (error) {
+            alert("Entro en el error")
             let dato=code.data
             let valor=dato.replace(/'/g, '"')
             var valorPrueba = valor.replace(/(\w+)\s*:/g, '"$1":');
             var valorUsar = eval('(' + valorPrueba + ')');
 
-            alert(valorUsar)
-            alert(valorUsar["Codigo de barra"])
+            
             
             //alert(code.data)
             
