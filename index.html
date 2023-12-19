@@ -255,9 +255,16 @@ if (esIPhone) {
                     const descuento= productoEncontrado.Descuento;
                     const precioConDescuento = productoEncontrado["Precio Con Descuento"];
 
-                    alert(detalle)
-                    alert(precio)
-
+                    Swal.fire({
+        title: `${detalle}`,
+        text: `PRECIO: $${precio}`,
+        confirmButtonText: 'OK',
+        customClass: {
+            confirmButton: 'custom-confirm-button',
+            content: 'custom-swal-content',
+            // Clase CSS personalizada para el contenido
+        },
+    });
                 
                 
             } else {
