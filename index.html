@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escáner QR para iPhone</title>
+  <style>
+    #preview {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <video id="preview" playsinline autoplay muted></video>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const video = document.getElementById('preview');
+
+      function initCamera() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+          .then(function (stream) {
+            video.srcObject = stream;
+
+            video.addEventListener('loadedmetadata', function () {
+              const canvas = document.createElement('canvas');
+              const context = canvas.getContext('2d');
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+
+              document.body.addEventListener('click', function () {
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+                // Aquí puedes procesar la imageData y trabajar con el código QR
+                console.log('Código QR escaneado');
+              });
+            });
+          })
+          .catch(function (error) {
+            console.error('Error al acceder a la cámara:', error);
+          });
+      }
+
+      // Solicitar acceso a la cámara cuando el usuario haga clic
+      document.body.addEventListener('click', function () {
+        initCamera();
+      });
+    });
+  </script>
+</body>
+</html>
