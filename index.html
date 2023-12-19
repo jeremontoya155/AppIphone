@@ -1,141 +1,149 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
     <title>Lector Farmacia Sanchez Antoniolli</title>
-    <link rel="icon" type="image/png" href="img/Logo.png"/>
+    <link rel="icon" type="image/png" href="img/Logo.png" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
-<style>
-    @font-face {
-        font-family: 'Futura';
-        src: url('fonts/futura\ medium\ bt.ttf') format('truetype');
-    }
+    <style>
+        @font-face {
+            font-family: 'Futura';
+            src: url('fonts/futura\ medium\ bt.ttf') format('truetype');
+        }
 
-    * {
-        font-family: 'Futura', sans-serif;
-    }
+        * {
+            font-family: 'Futura', sans-serif;
+        }
 
-    .mi-popup-clase {
-        background-color: white !important;
-        color: black !important;
-    }
+        .mi-popup-clase {
+            background-color: white !important;
+            color: black !important;
+        }
 
-    .custom-confirm-button {
-        background-color: #1a6e6e !important;
-        color: #fff;
-    }
+        .custom-confirm-button {
+            background-color: #1a6e6e !important;
+            color: #fff;
+        }
 
-    .mi-titulo-clase {
-        color: black !important;
-    }
+        .mi-titulo-clase {
+            color: black !important;
+        }
 
-    #logo {
-        max-width: 30em;
-        width: 100%;
-        height: auto;
-        margin-top: 1,5em;
-    }
+        #logo {
+            max-width: 30em;
+            width: 100%;
+            height: auto;
+            margin-top: 1, 5em;
+        }
 
-    .swal2-popup {
-        color: rgb(0, 0, 0);
-    }
+        .swal2-popup {
+            color: rgb(0, 0, 0);
+        }
 
-    .swal2-title {
-        color: #1a6e6e !important;
-    }
+        .swal2-title {
+            color: #1a6e6e !important;
+        }
 
-    body {
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        background: linear-gradient(45deg, #33b1b1, #1a6e6e);
-        overflow: hidden;
-    }
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(45deg, #33b1b1, #1a6e6e);
+            overflow: hidden;
+        }
 
-    header {
-        margin-top: 2em;
-        margin-bottom: -1em;
-    }
+        header {
+            margin-top: 2em;
+            margin-bottom: -1em;
+        }
 
-    h1 {
-        font-weight: normal;
-        font-size: 2em;
-        margin-top: -1em;
-        margin-bottom: 2em;
-        text-align: center;
-        color: white;
-    }
+        h1 {
+            font-weight: normal;
+            font-size: 2em;
+            margin-top: -1em;
+            margin-bottom: 2em;
+            text-align: center;
+            color: white;
+        }
 
-    h2 {
-        font-weight: normal;
-        font-size: 1.5em;
-        margin-top: -1em;
-        font: "Futura";
-        text-align: center;
-        color: white;
-    }
+        h2 {
+            font-weight: normal;
+            font-size: 1.5em;
+            margin-top: -1em;
+            font: "Futura";
+            text-align: center;
+            color: white;
+        }
 
-    video {
-        margin-bottom: 4em;
-    }
+        video {
+            margin-bottom: 4em;
+        }
 
-    #preview {
-        width: 100%;
-        max-width: 40vw;
-        max-height: 50vh;
-        margin-bottom: 5em;
-        border: 5px solid white;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    }
+        #video-container {
+            position: relative;
+            width: 100%;
+            max-width: 40vw;
+            margin: 0 auto;
+        }
 
-    #cameraSelector {
-        margin-bottom: 20px;
-        color: rgb(17, 13, 13);
-    }
+        #preview {
+            width: 100%;
+            height: auto;
+            max-height: 50vh;
+            border: 5px solid white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
 
-    .mensaje-personalizado {
-        text-align: left;
-        color: rgb(9, 7, 7);
-    }
+        #cameraSelector {
+            margin-bottom: 20px;
+            color: rgb(17, 13, 13);
+        }
 
-    .mi-boton-clase {
-        background-color: #ff7675;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
+        .mensaje-personalizado {
+            text-align: left;
+            color: rgb(9, 7, 7);
+        }
 
-    .mi-boton-clase:hover {
-        background-color: #d63031;
-    }
+        .mi-boton-clase {
+            background-color: #ff7675;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-    .amarillo {
-        font-weight: bold;
-        color: #F2BC08;
-        font-style: italic;
-    }
+        .mi-boton-clase:hover {
+            background-color: #d63031;
+        }
 
-    .centrar {
-        text-align: center;
-    }
+        .amarillo {
+            font-weight: bold;
+            color: #F2BC08;
+            font-style: italic;
+        }
 
-    footer {
-        margin-top: 3em;
-    }
-</style>
+        .centrar {
+            text-align: center;
+        }
+
+        footer {
+            margin-top: 3em;
+        }
+    </style>
 </head>
+
 <body>
     <header>
         <img id="logo" src="img/Logo.png" alt="Logo" />
@@ -148,7 +156,11 @@
     <h2><label for="cameraSelector">SELECCIONE UNA <br>CAMARA:</label></h2>
     <select id="cameraSelector"></select>
 
-    <video id="preview" playsinline></video>
+    <!-- Agrega un contenedor para el video -->
+    <div id="video-container">
+        <video id="preview" playsinline></video>
+    </div>
+
     <footer></footer>
 
     <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
@@ -158,7 +170,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             const video = document.createElement('video');
             video.setAttribute('playsinline', true);
-            document.body.appendChild(video);
+            document.getElementById('video-container').appendChild(video);
 
             const canvas = document.createElement('canvas');
             const canvasContext = canvas.getContext('2d');
@@ -180,12 +192,16 @@
                 });
 
             function tick() {
+                const container = document.getElementById('video-container');
+                const containerRect = container.getBoundingClientRect();
+                video.width = containerRect.width;
+                video.height = containerRect.height;
+
                 canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
                 const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
 
                 const code = jsQR(imageData.data, imageData.width, imageData.height);
                 if (code) {
-                    // Mostrar alerta con el contenido del código QR
                     alert('Contenido del código QR:\n' + code.data);
                 }
 
@@ -193,6 +209,7 @@
             }
         });
     </script>
-    
+
 </body>
+
 </html>
