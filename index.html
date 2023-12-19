@@ -59,7 +59,7 @@
             height: 100vh;
             background: linear-gradient(45deg, #33b1b1, #1a6e6e);
             overflow: hidden;
-            position: relative; /* Agrega esta propiedad */
+            position: relative; 
         }
 
         header {
@@ -85,17 +85,8 @@
             color: white;
         }
 
-        video {
-            width: 100%;
-            height: auto;
-            max-height: 50vh;
-            border: 5px solid white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-        }
-
         #camera-container {
-            position: absolute; /* Agrega esta propiedad */
+            position: absolute;
             top: 0;
             left: 0;
             right: 0;
@@ -103,6 +94,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1;
         }
 
         #video-container {
@@ -111,7 +103,7 @@
             margin: 0 auto;
         }
 
-        #preview {
+        video {
             width: 100%;
             height: auto;
             max-height: 50vh;
@@ -186,10 +178,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const video = document.createElement('video');
-            video.setAttribute('playsinline', true);
-            document.getElementById('video-container').appendChild(video);
-
+            const video = document.getElementById('preview');
             const canvas = document.createElement('canvas');
             const canvasContext = canvas.getContext('2d');
             document.body.appendChild(canvas);
@@ -227,7 +216,6 @@
             }
         });
     </script>
-
 </body>
 
 </html>
