@@ -31,22 +31,27 @@
     }
 
     h1 {
-      position: absolute;
+   
       top: 10px;
       left: 50%;
       transform: translateX(-50%);
       color: white;
       font-family: Arial, sans-serif;
       text-align: center;
-      z-index: 1; /* Asegura que el h1 esté encima del video */
+      
     }
   </style>
   <script src="https://rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
 </head>
 <body>
 
+    <div>
+        <h1>Lector de QR definitivo</h1>
+    </div>
+    
+
 <div id="qr-container">
-  <h1>Lector de QR definitivo</h1>
+ 
   <video playsinline></video>
   <canvas style="display:none;"></canvas>
 </div>
