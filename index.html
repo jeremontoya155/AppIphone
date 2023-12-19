@@ -237,12 +237,12 @@ if (esIPhone) {
     // Cargar datos desde el archivo Base.json
     fetch('Base.json')
       .then(response => response.json())
-      .then(datos_lista => {
+      .then(datos_lista => {    
         const code = jsQR(imageData.data, imageData.width, imageData.height);
         if (code) {
           // Parsear el JSON
           try {
-            const objetoJSON = JSON.parse(code.data);
+            const objetoJSON = JSON.parse(code.data[1]);
 
 // Ahora, objetoJSON se comporta como un diccionario
 // Acceder al valor de la propiedad "Codigo de barra"
@@ -254,6 +254,7 @@ alert('Código de Barras:\n' + codigoDeBarras);
           } catch (error) {
             
             alert(code.data)
+            
           }
           
         }
