@@ -241,10 +241,8 @@ if (esIPhone) {
         const code = jsQR(imageData.data, imageData.width, imageData.height);
         if (code) {
           // Parsear el JSON
-          const codigoDeBarras = JSON.parse(code.data)["Codigo de barra"];
-
-          // Mostrar alerta con el contenido del código de barras
-          alert('Código de Barras:\n' + codigoDeBarras);
+          alert(typeof(code.data))
+          alert(code.data)
         }
 
         requestAnimationFrame(tick);
