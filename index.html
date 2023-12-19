@@ -165,8 +165,8 @@
     </div>
 
     <!-- Selector de cámaras -->
-    <h2><label for="cameraSelector">SELECCIONE UNA <br>CAMARA:</label></h2>
-    <select id="cameraSelector"></select>
+    <h2 class="subtitulo"><label for="cameraSelector">SELECCIONE UNA <br>CAMARA:</label></h2>
+    <select class="subtitulo" id="cameraSelector"></select>
 
     <div id="qr-container">
         
@@ -211,6 +211,18 @@ const constraints = {
 let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
 
 if (esIPhone) {
+
+// Obtener una lista de elementos con la clase 'subtitulo'
+var elementosConClase = document.getElementsByClassName('subtitulo');
+
+// Convertir la lista en un array para facilitar el manejo
+var elementosArray = Array.from(elementosConClase);
+
+// Iterar sobre cada elemento y eliminarlo
+elementosArray.forEach(function (elemento) {
+  elemento.remove();
+});
+
   const video = document.querySelector('video');
   const canvas = document.querySelector('canvas');
   const canvasContext = canvas.getContext('2d');
@@ -337,8 +349,9 @@ if (esIPhone) {
           }
           
         }
-        
+        setTimeout(function () {
         requestAnimationFrame(tick);
+      }, 1000);
       });
   }
 }
