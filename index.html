@@ -4,39 +4,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lector de QR</title>
-  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 </head>
 <body>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const startCameraButton = document.createElement('button');
-    startCameraButton.textContent = 'Iniciar Cámara';
-    document.body.appendChild(startCameraButton);
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*'; // Acepta archivos de imagen
 
-    let scanner;
+    const startReaderButton = document.createElement('button');
+    startReaderButton.textContent = 'Iniciar Lector QR';
+    document.body.appendChild(startReaderButton);
 
-    function initCamera() {
-      scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
+    startReaderButton.addEventListener('click', function () {
+      fileInput.click(); // Hacer clic en el input de archivo al hacer clic en el botón
+    });
 
-      Instascan.Camera.getCameras().then(function (cameras) {
-        if (cameras.length > 0) {
-          scanner.start(cameras[0]); // Cambiar a [1] para la cámara trasera
-        } else {
-          console.error('No se encontraron cámaras disponibles.');
-        }
-      }).catch(function (error) {
-        console.error('Error al acceder a la cámara:', error);
-      });
+    fileInput.addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
 
-      scanner.addListener('scan', function (content) {
-        alert('Contenido del código QR:\n' + content);
-      });
-    }
+        reader.onload = function (e) {
+          const image = new Image();
+          image.src = e.target.result;
 
-    startCameraButton.addEventListener('click', function () {
-      if (!scanner) {
-        initCamera();
+          image.onload = function () {
+            const barcodeDetector = new BarcodeDetector();
+
+            barcodeDetector.detect(image)
+              .then(barcodes => {
+                if (barcodes.length > 0) {
+                  // Mostrar alerta con el contenido del código QR
+                  alert('Contenido del código QR:\n' + barcodes[0].rawValue);
+                } else {
+                  alert('No se encontraron códigos QR en la imagen.');
+                }
+              })
+              .catch(error => {
+                console.error('Error al detectar códigos QR:', error);
+              });
+          };
+        };
+
+        reader.readAsDataURL(file);
       }
     });
   });
