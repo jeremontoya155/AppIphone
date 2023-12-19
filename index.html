@@ -16,38 +16,32 @@
       // Si es Android o PC, muestra un alert
       alert('Ingreso desde Android o PC');
     } else if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
-      // Si es un dispositivo iOS, inicia la cámara como se mostró anteriormente
-      const video = document.createElement('video');
-      document.body.appendChild(video);
+      // Si es un dispositivo iOS, muestra un botón para iniciar la cámara
+      const startCameraButton = document.createElement('button');
+      startCameraButton.textContent = 'Iniciar Cámara';
+      document.body.appendChild(startCameraButton);
+
+      let video;
 
       function initCamera() {
         navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
           .then(function (stream) {
+            video = document.createElement('video');
             video.srcObject = stream;
-
-            video.addEventListener('loadedmetadata', function () {
-              const canvas = document.createElement('canvas');
-              const context = canvas.getContext('2d');
-              canvas.width = video.videoWidth;
-              canvas.height = video.videoHeight;
-
-              document.body.addEventListener('click', function () {
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-
-                // Aquí puedes procesar la imageData y trabajar con el código QR
-                console.log('Código QR escaneado');
-              });
-            });
+            video.setAttribute('playsinline', true);
+            video.setAttribute('autoplay', true);
+            document.body.appendChild(video);
           })
           .catch(function (error) {
             console.error('Error al acceder a la cámara:', error);
           });
       }
 
-      // Solicitar acceso a la cámara cuando el usuario haga clic
-      document.body.addEventListener('click', function () {
-        initCamera();
+      // Solicitar acceso a la cámara cuando el usuario haga clic en el botón
+      startCameraButton.addEventListener('click', function () {
+        if (!video) {
+          initCamera();
+        }
       });
     }
   });
