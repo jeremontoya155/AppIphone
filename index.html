@@ -155,78 +155,42 @@
     <script src="https://rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const cameraSelector = document.getElementById('cameraSelector');
-            const preview = document.getElementById('preview');
-    
-            navigator.mediaDevices.enumerateDevices()
-                .then(devices => {
-                    const videoDevices = devices.filter(device => device.kind === 'videoinput');
-    
-                    if (videoDevices.length === 0) {
-                        throw new Error('No se encontraron cámaras en el dispositivo.');
-                    }
-    
-                    videoDevices.forEach((camera, index) => {
-                        const option = document.createElement('option');
-                        option.value = index;
-                        option.text = camera.label || `Cámara ${index + 1}`;
-                        cameraSelector.add(option);
-                    });
-    
-                    const constraints = {
-                        video: {
-                            deviceId: { exact: videoDevices[0].deviceId },
-                            facingMode: "environment"
-                        }
-                    };
-    
-                    return navigator.mediaDevices.getUserMedia(constraints);
-                })
-                .then(stream => {
-                    preview.srcObject = stream;
-                    preview.play();
-    
-                    cameraSelector.addEventListener('change', function () {
-                        const selectedCamera = videoDevices[cameraSelector.value];
-                        const newConstraints = {
-                            video: {
-                                deviceId: { exact: selectedCamera.deviceId },
-                                facingMode: "environment"
-                            }
-                        };
-    
-                        navigator.mediaDevices.getUserMedia(newConstraints)
-                            .then(newStream => {
-                                const tracks = preview.srcObject.getTracks();
-                                tracks.forEach(track => track.stop());
-                                preview.srcObject = newStream;
-                                preview.play();
-                            })
-                            .catch(error => console.error('Error al acceder a la nueva cámara:', error));
+        document.addEventListener('DOMContentLoaded', function () {
+            const video = document.createElement('video');
+            video.setAttribute('playsinline', true);
+            document.body.appendChild(video);
+
+            const canvas = document.createElement('canvas');
+            const canvasContext = canvas.getContext('2d');
+            document.body.appendChild(canvas);
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(function (stream) {
+                    video.srcObject = stream;
+                    video.play();
+
+                    video.addEventListener('loadedmetadata', function () {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        requestAnimationFrame(tick);
                     });
                 })
-                .catch(error => console.error('Error al enumerar los dispositivos:', error));
-    
-            preview.addEventListener('loadedmetadata', () => {
-                const handleQrCode = function (content) {
-                    try {
-                        const code = jsQR(content, preview.videoWidth, preview.videoHeight);
-                        if (code) {
-                            const mensajeAlerta = code.data;
-                            alert(`CÓDIGO QR LEÍDO: ${mensajeAlerta}`);
-                        } else {
-                            console.warn('Código QR no válido.');
-                        }
-                    } catch (error) {
-                        console.error('Error al procesar el código QR:', error);
-                    }
-                };
-    
-                const qrScanner = new Instascan.Scanner({ video: preview });
-                qrScanner.addListener('scan', handleQrCode);
-                qrScanner.start();
-            });
+                .catch(function (error) {
+                    console.error('Error al acceder a la cámara:', error);
+                });
+
+            function tick() {
+                canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                if (code) {
+                    // Mostrar alerta con el contenido del código QR
+                    alert('Contenido del código QR:\n' + code.data);
+                }
+
+                requestAnimationFrame(tick);
+            }
         });
     </script>
     
