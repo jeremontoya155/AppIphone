@@ -176,8 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // Configuración e inicialización del lector
-    const scanner = new Instascan.Scanner({ video: video, facingMode: 'environment' });
-
+    let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false ,facingMode: "environment"});
     
 
     // Cargar datos desde el archivo Base.json
