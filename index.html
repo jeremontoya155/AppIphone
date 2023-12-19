@@ -137,9 +137,13 @@
 </style>
 </head>
 <body>
-    <header><img id="logo" src="img/Logo.png" alt="Logo" /></header>
+    <header>
+        <img id="logo" src="img/Logo.png" alt="Logo" />
+    </header>
 
-    <div class="centrar"><h1>ESCANEÁ EL <strong class="amarillo">QR</strong> <br> DEL PRODUCTO QUE DESEAS Y <br> <strong class="amarillo">CONOCE SU PRECIO!</strong></h1></div>
+    <div class="centrar">
+        <h1>ESCANEÁ EL <strong class="amarillo">QR</strong> <br> DEL PRODUCTO QUE DESEAS Y <br> <strong class="amarillo">CONOCE SU PRECIO!</strong></h1>
+    </div>
 
     <h2><label for="cameraSelector">SELECCIONE UNA <br>CAMARA:</label></h2>
     <select id="cameraSelector"></select>
@@ -151,98 +155,88 @@
     <script src="https://rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
 
     <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Selector de cámaras
-    const cameraSelector = document.getElementById('cameraSelector');
-    const preview = document.getElementById('preview');
+        document.addEventListener("DOMContentLoaded", function () {
+            const cameraSelector = document.getElementById('cameraSelector');
+            const preview = document.getElementById('preview');
 
-    navigator.mediaDevices.enumerateDevices()
-        .then(devices => {
-            // Filtrar dispositivos de video
-            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+            navigator.mediaDevices.enumerateDevices()
+                .then(devices => {
+                    const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
-            if (videoDevices.length === 0) {
-                throw new Error('No se encontraron cámaras en el dispositivo.');
-            }
+                    if (videoDevices.length === 0) {
+                        throw new Error('No se encontraron cámaras en el dispositivo.');
+                    }
 
-            videoDevices.forEach((camera, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.text = camera.label || `Cámara ${index + 1}`;
-                cameraSelector.add(option);
-            });
+                    videoDevices.forEach((camera, index) => {
+                        const option = document.createElement('option');
+                        option.value = index;
+                        option.text = camera.label || `Cámara ${index + 1}`;
+                        cameraSelector.add(option);
+                    });
 
-            // Inicializar la cámara con la primera disponible
-            const constraints = {
-                video: {
-                    deviceId: { exact: videoDevices[0].deviceId },
-                    facingMode: "environment"
-                }
-            };
+                    const constraints = {
+                        video: {
+                            deviceId: { exact: videoDevices[0].deviceId },
+                            facingMode: "environment"
+                        }
+                    };
 
-            return navigator.mediaDevices.getUserMedia(constraints);
-        })
-        .then(stream => {
-            preview.srcObject = stream;
-            preview.play();
+                    return navigator.mediaDevices.getUserMedia(constraints);
+                })
+                .then(stream => {
+                    preview.srcObject = stream;
+                    preview.play();
 
-            // Actualizar el lector cuando se cambia la cámara
-            cameraSelector.addEventListener('change', function () {
-                const selectedCamera = videoDevices[cameraSelector.value];
-                const newConstraints = {
-                    video: {
-                        deviceId: { exact: selectedCamera.deviceId },
-                        facingMode: "environment"
+                    cameraSelector.addEventListener('change', function () {
+                        const selectedCamera = videoDevices[cameraSelector.value];
+                        const newConstraints = {
+                            video: {
+                                deviceId: { exact: selectedCamera.deviceId },
+                                facingMode: "environment"
+                            }
+                        };
+
+                        navigator.mediaDevices.getUserMedia(newConstraints)
+                            .then(newStream => {
+                                const tracks = preview.srcObject.getTracks();
+                                tracks.forEach(track => track.stop());
+                                preview.srcObject = newStream;
+                                preview.play();
+                            })
+                            .catch(error => console.error('Error al acceder a la nueva cámara:', error));
+                    });
+                })
+                .catch(error => console.error('Error al enumerar los dispositivos:', error));
+
+            preview.addEventListener('loadedmetadata', () => {
+                const handleQrCode = function (content) {
+                    try {
+                        const code = jsQR(content, preview.videoWidth, preview.videoHeight);
+                        if (code) {
+                            const mensajeAlerta = code.data;
+
+                            Swal.fire({
+                                title: 'CÓDIGO QR LEÍDO',
+                                text: mensajeAlerta,
+                                confirmButtonText: 'OK',
+                                customClass: {
+                                    confirmButton: 'custom-confirm-button',
+                                    content: 'custom-swal-content',
+                                },
+                            });
+                        } else {
+                            console.warn('Código QR no válido.');
+                        }
+                    } catch (error) {
+                        console.error('Error al procesar el código QR:', error);
                     }
                 };
 
-                navigator.mediaDevices.getUserMedia(newConstraints)
-                    .then(newStream => {
-                        const tracks = preview.srcObject.getTracks();
-                        tracks.forEach(track => track.stop());
-                        preview.srcObject = newStream;
-                        preview.play();
-                    })
-                    .catch(error => console.error('Error al acceder a la nueva cámara:', error));
+                const qrScanner = new Instascan.Scanner({ video: preview });
+                qrScanner.addListener('scan', handleQrCode);
+                qrScanner.start();
             });
-
-        })
-        .catch(error => console.error('Error al enumerar los dispositivos:', error));
-
-    // Manejar la lectura del código QR
-    const handleQrCode = function (content) {
-        try {
-            const code = jsQR(content, preview.videoWidth, preview.videoHeight);
-            if (code) {
-                const jsonString = code.data;
-                const producto = JSON.parse(jsonString);
-
-                // Mostrar el valor con un SweetAlert
-                Swal.fire({
-                    title: 'Código QR Escaneado',
-                    text: JSON.stringify(producto),
-                    confirmButtonText: 'OK',
-                    customClass: {
-                        confirmButton: 'custom-confirm-button',
-                        content: 'custom-swal-content',
-                    },
-                });
-            } else {
-                console.warn('Código QR no válido.');
-            }
-        } catch (error) {
-            console.error('Error al procesar el código QR:', error);
-        }
-    };
-
-    // Escuchar el evento de carga de metadatos del video para obtener sus dimensiones
-    preview.addEventListener('loadedmetadata', () => {
-        // Configurar el lector para manejar el código QR
-        const qrScanner = new Instascan.Scanner({ video: preview });
-        qrScanner.addListener('scan', handleQrCode);
-        qrScanner.start();
-    });
-});
+        });
     </script>
 </body>
 </html>
