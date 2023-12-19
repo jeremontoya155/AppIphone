@@ -148,7 +148,6 @@
     <footer></footer>
 
     <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-
     <script src="https://rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
 
     <script>
@@ -187,11 +186,6 @@ document.addEventListener("DOMContentLoaded", function () {
             preview.srcObject = stream;
             preview.play();
 
-            // Configuración e inicialización del lector
-            let scanner = new Instascan.Scanner({ video: preview, mirror: false });
-
-            scanner.addListener('scan', handleQrCode);
-
             // Actualizar el lector cuando se cambia la cámara
             cameraSelector.addEventListener('change', function () {
                 const selectedCamera = videoDevices[cameraSelector.value];
@@ -208,9 +202,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         tracks.forEach(track => track.stop());
                         preview.srcObject = newStream;
                         preview.play();
-                        scanner.stop();
-                        scanner = new Instascan.Scanner({ video: preview, mirror: false });
-                        scanner.addListener('scan', handleQrCode);
                     })
                     .catch(error => console.error('Error al acceder a la nueva cámara:', error));
             });
@@ -218,6 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(error => console.error('Error al enumerar los dispositivos:', error));
 
+    // Manejar la lectura del código QR
     const handleQrCode = function (content) {
         try {
             const code = jsQR(content, preview.videoWidth, preview.videoHeight);
@@ -225,8 +217,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 const jsonString = code.data;
                 const producto = JSON.parse(jsonString);
 
-                // Realizar acciones con la información del producto
-                console.log(producto);
+                // Mostrar el valor con un SweetAlert
+                Swal.fire({
+                    title: 'Código QR Escaneado',
+                    text: JSON.stringify(producto),
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        confirmButton: 'custom-confirm-button',
+                        content: 'custom-swal-content',
+                    },
+                });
             } else {
                 console.warn('Código QR no válido.');
             }
@@ -234,6 +234,14 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error('Error al procesar el código QR:', error);
         }
     };
+
+    // Escuchar el evento de carga de metadatos del video para obtener sus dimensiones
+    preview.addEventListener('loadedmetadata', () => {
+        // Configurar el lector para manejar el código QR
+        const qrScanner = new Instascan.Scanner({ video: preview });
+        qrScanner.addListener('scan', handleQrCode);
+        qrScanner.start();
+    });
 });
     </script>
 </body>
