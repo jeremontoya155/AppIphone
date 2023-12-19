@@ -252,6 +252,9 @@ const codigoDeBarras = objetoJSON["Codigo de barra"];
 alert('Código de Barras:\n' + codigoDeBarras);
             
           } catch (error) {
+            let dato=code.data
+            let valor=dato.replace(/'/g, '"')
+            alert(valor)
             
             alert(code.data)
             alert(code.data[0])
