@@ -1,52 +1,239 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lector de QR</title>
-  <script src="https://rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <title>Lector Farmacia Sanchez Antoniolli</title>
+    <link rel="icon" type="image/png" href="img/Logo.png"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<style>
+    @font-face {
+        font-family: 'Futura';
+        src: url('fonts/futura\ medium\ bt.ttf') format('truetype');
+    }
+
+    * {
+        font-family: 'Futura', sans-serif;
+    }
+
+    .mi-popup-clase {
+        background-color: white !important;
+        color: black !important;
+    }
+
+    .custom-confirm-button {
+        background-color: #1a6e6e !important;
+        color: #fff;
+    }
+
+    .mi-titulo-clase {
+        color: black !important;
+    }
+
+    #logo {
+        max-width: 30em;
+        width: 100%;
+        height: auto;
+        margin-top: 1,5em;
+    }
+
+    .swal2-popup {
+        color: rgb(0, 0, 0);
+    }
+
+    .swal2-title {
+        color: #1a6e6e !important;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background: linear-gradient(45deg, #33b1b1, #1a6e6e);
+        overflow: hidden;
+    }
+
+    header {
+        margin-top: 2em;
+        margin-bottom: -1em;
+    }
+
+    h1 {
+        font-weight: normal;
+        font-size: 2em;
+        margin-top: -1em;
+        margin-bottom: 2em;
+        text-align: center;
+        color: white;
+    }
+
+    h2 {
+        font-weight: normal;
+        font-size: 1.5em;
+        margin-top: -1em;
+        font: "Futura";
+        text-align: center;
+        color: white;
+    }
+
+    video {
+        margin-bottom: 4em;
+    }
+
+    #preview {
+        width: 100%;
+        max-width: 40vw;
+        max-height: 50vh;
+        margin-bottom: 5em;
+        border: 5px solid white;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+
+    #cameraSelector {
+        margin-bottom: 20px;
+        color: rgb(17, 13, 13);
+    }
+
+    .mensaje-personalizado {
+        text-align: left;
+        color: rgb(9, 7, 7);
+    }
+
+    .mi-boton-clase {
+        background-color: #ff7675;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .mi-boton-clase:hover {
+        background-color: #d63031;
+    }
+
+    .amarillo {
+        font-weight: bold;
+        color: #F2BC08;
+        font-style: italic;
+    }
+
+    .centrar {
+        text-align: center;
+    }
+
+    footer {
+        margin-top: 3em;
+    }
+</style>
 </head>
 <body>
+    <header><img id="logo" src="img/Logo.png" alt="Logo" /></header>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const video = document.createElement('video');
-    video.setAttribute('playsinline', true);
-    document.body.appendChild(video);
+    <div class="centrar"><h1>ESCANEÁ EL <strong class="amarillo">QR</strong> <br> DEL PRODUCTO QUE DESEAS Y <br> <strong class="amarillo">CONOCE SU PRECIO!</strong></h1></div>
 
-    const canvas = document.createElement('canvas');
-    const canvasContext = canvas.getContext('2d');
-    document.body.appendChild(canvas);
+    <h2><label for="cameraSelector">SELECCIONE UNA <br>CAMARA:</label></h2>
+    <select id="cameraSelector"></select>
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(function (stream) {
-        video.srcObject = stream;
-        video.play();
+    <video id="preview" playsinline></video>
+    <footer></footer>
 
-        video.addEventListener('loadedmetadata', function () {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          requestAnimationFrame(tick);
-        });
-      })
-      .catch(function (error) {
-        console.error('Error al acceder a la cámara:', error);
-      });
+    <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 
-    function tick() {
-      canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+    <script src="https://rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
 
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
-      if (code) {
-        // Mostrar alerta con el contenido del código QR
-        alert('Contenido del código QR:\n' + code.data);
-      }
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Selector de cámaras
+    const cameraSelector = document.getElementById('cameraSelector');
+    const preview = document.getElementById('preview');
 
-      requestAnimationFrame(tick);
-    }
-  });
-</script>
+    navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+            // Filtrar dispositivos de video
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
+            if (videoDevices.length === 0) {
+                throw new Error('No se encontraron cámaras en el dispositivo.');
+            }
+
+            videoDevices.forEach((camera, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.text = camera.label || `Cámara ${index + 1}`;
+                cameraSelector.add(option);
+            });
+
+            const constraints = {
+                video: {
+                    deviceId: { exact: videoDevices[cameraSelector.value].deviceId },
+                    facingMode: "environment"
+                }
+            };
+
+            // Configuración e inicialización del lector
+            let scanner = new Instascan.Scanner({ video: preview, mirror: false });
+
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(stream => {
+                    preview.srcObject = stream;
+                    preview.play();
+                    scanner.addListener('scan', handleQrCode);
+                })
+                .catch(error => console.error('Error al acceder a la cámara:', error));
+
+            // Actualizar el lector cuando se cambia la cámara
+            cameraSelector.addEventListener('change', function () {
+                const selectedCamera = videoDevices[cameraSelector.value];
+                const newConstraints = {
+                    video: {
+                        deviceId: { exact: selectedCamera.deviceId },
+                        facingMode: "environment"
+                    }
+                };
+
+                navigator.mediaDevices.getUserMedia(newConstraints)
+                    .then(newStream => {
+                        const tracks = preview.srcObject.getTracks();
+                        tracks.forEach(track => track.stop());
+                        preview.srcObject = newStream;
+                        preview.play();
+                        scanner.stop();
+                        scanner = new Instascan.Scanner({ video: preview, mirror: false });
+                        scanner.addListener('scan', handleQrCode);
+                    })
+                    .catch(error => console.error('Error al acceder a la nueva cámara:', error));
+            });
+
+        })
+        .catch(error => console.error('Error al enumerar los dispositivos:', error));
+
+    const handleQrCode = function (content) {
+        try {
+            const code = jsQR(content, preview.videoWidth, preview.videoHeight);
+            if (code) {
+                const jsonString = code.data;
+                const producto = JSON.parse(jsonString);
+
+                // Realizar acciones con la información del producto
+                console.log(producto);
+            } else {
+                console.warn('Código QR no válido.');
+            }
+        } catch (error) {
+            console.error('Error al procesar el código QR:', error);
+        }
+    };
+});
+    </script>
 </body>
 </html>
