@@ -255,6 +255,7 @@ if (esIPhone) {
                     const descuento= productoEncontrado.Descuento;
                     const precioConDescuento = productoEncontrado["Precio Con Descuento"];
 
+                if (precio===precioConDescuento || descuento==="A") {
                     Swal.fire({
         title: `${detalle}`,
         text: `PRECIO: $${precio}`,
@@ -265,10 +266,30 @@ if (esIPhone) {
             // Clase CSS personalizada para el contenido
         },
     });
+                    
+
+                } else {
+                    
+                    Swal.fire({
+        title: `${detalle}`,
+        html: `<div><strong>Precio</strong>: $${precio}<br></div>
+        <div><strong>DESCUENTO</strong>:%${descuento}<br></div>
+        <div><strong>Precio Final</strong>:$${precioConDescuento}<br></div>`,
+        confirmButtonText: 'OK',
+        customClass: {
+            confirmButton: 'custom-confirm-button',
+            content: 'custom-swal-content', // Clase CSS personalizada para el contenido
+        }
+        ,
+    });
+                    
+                }
+
+               
                 
                 
             } else {
-                
+                alert("Producto no disponible en este momento")
             }    
 
 
@@ -291,7 +312,7 @@ if (esIPhone) {
           }
           
         }
-
+        
         requestAnimationFrame(tick);
       });
   }
